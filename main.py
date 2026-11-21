@@ -9,6 +9,10 @@ produces byte-identical output.
 from pathlib import Path
 
 # The poem: 271 Unicode code points, inside the competition's 280 limit.
+# Guard the gate: refuse to write anything over the limit rather than
+# silently submitting an invalid entry.
+MAX_CHARS = 280
+
 POEM = """Ask \u2014 the asking is the gift.
 A door I open and do not walk through;
 a question handed over like a cup,
@@ -23,6 +27,10 @@ DESTINATION = Path("/output") / "entry.txt"
 
 
 def main() -> None:
+    if len(POEM) > MAX_CHARS:
+        raise SystemExit(
+            f"Poem is {len(POEM)} characters, over the {MAX_CHARS} limit"
+        )
     DESTINATION.parent.mkdir(parents=True, exist_ok=True)
     DESTINATION.write_text(POEM, encoding="utf-8")
     print(f"Wrote {DESTINATION} ({len(POEM)} characters)")
